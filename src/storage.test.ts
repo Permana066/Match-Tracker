@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { hapusSesi, KUNCI_SESI, muatSesi, simpanSesi } from './storage'
+import { KUNCI_SESI, muatSesi, simpanSesi } from './storage'
 import { sesiAwal } from './domain/session'
 import type { Sesi } from './domain/types'
 
@@ -37,12 +37,6 @@ describe('penyimpanan sesi', () => {
 
   it('mengembalikan null bila struktur data tidak sesuai', () => {
     localStorage.setItem(KUNCI_SESI, JSON.stringify({ mode: 'ganda' }))
-    expect(muatSesi()).toBeNull()
-  })
-
-  it('menghapus sesi tersimpan', () => {
-    simpanSesi(sesiContoh())
-    hapusSesi()
     expect(muatSesi()).toBeNull()
   })
 

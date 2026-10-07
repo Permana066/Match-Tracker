@@ -1,4 +1,4 @@
-import type { Aksi } from '../domain/session'
+import { rondeAktif, type Aksi } from '../domain/session'
 import { rondeSelesai } from '../domain/score'
 import type { Sesi } from '../domain/types'
 import { KELAS_KARTU, KELAS_TOMBOL_SEKUNDER, KELAS_TOMBOL_UTAMA, LABEL_STATUS } from '../ui'
@@ -10,7 +10,7 @@ interface Props {
 }
 
 export function DaftarMatchScreen({ sesi, dispatch, nama }: Props) {
-  const ronde = sesi.ronde[sesi.rondeAktif - 1]
+  const ronde = rondeAktif(sesi)!
   const lengkap = rondeSelesai(ronde)
 
   return (

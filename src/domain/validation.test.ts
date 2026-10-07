@@ -37,6 +37,11 @@ describe('pesanValidasiMulai', () => {
     expect(pesanValidasiMulai(1, 'tunggal')).toBe('Minimal 2 pemain untuk mode Tunggal.')
   })
 
+  it('mengizinkan tepat 30 pemain pada kedua mode', () => {
+    expect(pesanValidasiMulai(30, 'ganda')).toBeNull()
+    expect(pesanValidasiMulai(30, 'tunggal')).toBeNull()
+  })
+
   it('menolak lebih dari 30 pemain', () => {
     expect(pesanValidasiMulai(31, 'ganda')).toBe('Maksimal 30 pemain.')
   })

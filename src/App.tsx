@@ -4,7 +4,7 @@ import { RekapScreen } from './components/RekapScreen'
 import { SetupScreen } from './components/SetupScreen'
 import { SkorScreen } from './components/SkorScreen'
 import { AkhirRondeScreen } from './components/AkhirRondeScreen'
-import { reducer, sesiAwal } from './domain/session'
+import { reducer, rondeAktif, sesiAwal } from './domain/session'
 import { muatSesi, simpanSesi } from './storage'
 
 export default function App() {
@@ -19,7 +19,7 @@ export default function App() {
     return (id: string) => peta.get(id) ?? id
   }, [sesi.pemain])
 
-  const ronde = sesi.ronde[sesi.rondeAktif - 1]
+  const ronde = rondeAktif(sesi)
   const matchDibuka = ronde?.match.find((m) => m.id === sesi.matchAktif)
 
   const layar = () => {
@@ -39,7 +39,7 @@ export default function App() {
       case 'akhir_ronde':
         return <AkhirRondeScreen sesi={sesi} dispatch={dispatch} nama={nama} />
       case 'rekap':
-        return <RekapScreen sesi={sesi} dispatch={dispatch} />
+        return <RekapScreen sesi={sesi} dispatch={dispatch} nama={nama} />
       default:
         return <SetupScreen sesi={sesi} dispatch={dispatch} />
     }

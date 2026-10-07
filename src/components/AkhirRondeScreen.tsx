@@ -1,5 +1,5 @@
 import { pemenang } from '../domain/score'
-import type { Aksi } from '../domain/session'
+import { rondeAktif, type Aksi } from '../domain/session'
 import type { Sesi } from '../domain/types'
 import { KELAS_KARTU, KELAS_TOMBOL_SEKUNDER, KELAS_TOMBOL_UTAMA } from '../ui'
 
@@ -10,7 +10,7 @@ interface Props {
 }
 
 export function AkhirRondeScreen({ sesi, dispatch, nama }: Props) {
-  const ronde = sesi.ronde[sesi.rondeAktif - 1]
+  const ronde = rondeAktif(sesi)!
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-5">

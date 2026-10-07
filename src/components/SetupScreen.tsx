@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import type { Sesi } from '../domain/types'
 import type { Aksi } from '../domain/session'
-import { pesanValidasiMulai, validasiNamaBaru } from '../domain/validation'
+import { MAKSIMAL_PEMAIN, pesanValidasiMulai, validasiNamaBaru } from '../domain/validation'
 import { KELAS_KARTU, KELAS_TOMBOL_SEKUNDER, KELAS_TOMBOL_UTAMA, LABEL_MODE } from '../ui'
 
 interface Props {
@@ -15,10 +15,15 @@ export function SetupScreen({ sesi, dispatch }: Props) {
   const [pesan, setPesan] = useState<string | null>(null)
 
   const sedangEdit = idEdit !== null
+  const penuh = sesi.pemain.length >= MAKSIMAL_PEMAIN
   const pesanMulai = pesanValidasiMulai(sesi.pemain.length, sesi.mode)
 
   const simpan = (event: FormEvent) => {
     event.preventDefault()
+    if (penuh && !sedangEdit) {
+      setPesan(`Maksimal ${MAKSIMAL_PEMAIN} pemain.`)
+      return
+    }
     const lain = sesi.pemain.filter((p) => p.id !== idEdit).map((p) => p.nama)
     const hasil = validasiNamaBaru(namaInput, lain)
     if (!hasil.ok) {
@@ -87,7 +92,7 @@ export function SetupScreen({ sesi, dispatch }: Props) {
       </section>
 
       <section className={KELAS_KARTU}>
-        <h2 className="mb-3 text-lg font-bold">Pemain ({sesi.pemain.length}/30)</h2>
+        <h2 className="mb-3 text-lg font-bold">Pemain ({sesi.pemain.length}/{MAKSIMAL_PEMAIN})</h2>
 
         <form onSubmit={simpan} noValidate className="mb-4 flex flex-col gap-2 sm:flex-row">
           <div className="flex-1">

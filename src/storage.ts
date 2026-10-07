@@ -63,11 +63,3 @@ export function muatSesi(): Sesi | null {
     return null
   }
 }
-
-export function hapusSesi(): void {
-  try {
-    localStorage.removeItem(KUNCI_SESI)
-  } catch {
-    // Abaikan — sesi baru akan menimpa kunci yang sama.
-  }
-}

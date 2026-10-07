@@ -15,13 +15,8 @@ export async function tambahBanyak(pengguna: Pengguna, nama: string[]): Promise<
   for (const n of nama) await tambahPemain(pengguna, n)
 }
 
-export async function mulaiSesi(
-  pengguna: Pengguna,
-  nama: string[],
-  mode?: 'Ganda' | 'Tunggal',
-): Promise<void> {
+export async function mulaiSesi(pengguna: Pengguna, nama: string[]): Promise<void> {
   await tambahBanyak(pengguna, nama)
-  if (mode) await pengguna.click(screen.getByRole('radio', { name: mode }))
   await pengguna.click(screen.getByRole('button', { name: 'Mulai' }))
 }
 

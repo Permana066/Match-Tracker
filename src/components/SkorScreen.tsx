@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { pemenang, type Tim } from '../domain/score'
-import type { Aksi } from '../domain/session'
+import { rondeAktif, type Aksi } from '../domain/session'
 import type { Sesi } from '../domain/types'
 import { KELAS_KARTU, KELAS_TOMBOL_SEKUNDER, KELAS_TOMBOL_UTAMA, LABEL_STATUS } from '../ui'
 
@@ -61,7 +61,7 @@ function PanelTim({
 
 export function SkorScreen({ sesi, dispatch, nama }: Props) {
   const [editAktif, setEditAktif] = useState(false)
-  const ronde = sesi.ronde[sesi.rondeAktif - 1]
+  const ronde = rondeAktif(sesi)!
   const match = ronde.match.find((m) => m.id === sesi.matchAktif)
   if (!match) return null
 

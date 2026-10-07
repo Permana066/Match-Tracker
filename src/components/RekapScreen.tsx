@@ -6,9 +6,10 @@ import { KELAS_KARTU, KELAS_TOMBOL_UTAMA } from '../ui'
 interface Props {
   sesi: Sesi
   dispatch: (aksi: Aksi) => void
+  nama: (id: string) => string
 }
 
-export function RekapScreen({ sesi, dispatch }: Props) {
+export function RekapScreen({ sesi, dispatch, nama }: Props) {
   const tabel = klasemen(sesi.ronde, sesi.pemain)
 
   return (
@@ -70,10 +71,10 @@ export function RekapScreen({ sesi, dispatch }: Props) {
                 <div className="min-w-0">
                   <p className="text-xs font-semibold text-slate-400">Match {i + 1}</p>
                   <p className="truncate text-sm font-medium">
-                    {m.timA.map((id) => sesi.pemain.find((p) => p.id === id)?.nama ?? id).join(', ')}
+                    {m.timA.map(nama).join(', ')}
                   </p>
                   <p className="truncate text-sm font-medium">
-                    {m.timB.map((id) => sesi.pemain.find((p) => p.id === id)?.nama ?? id).join(', ')}
+                    {m.timB.map(nama).join(', ')}
                   </p>
                 </div>
                 <p className="shrink-0 text-xl font-black tabular-nums text-teal-700">
@@ -85,9 +86,7 @@ export function RekapScreen({ sesi, dispatch }: Props) {
           {ronde.istirahat.length > 0 && (
             <p className="mt-2 text-xs text-slate-500">
               Istirahat:{' '}
-              {ronde.istirahat
-                .map((id) => sesi.pemain.find((p) => p.id === id)?.nama ?? id)
-                .join(', ')}
+              {ronde.istirahat.map(nama).join(', ')}
             </p>
           )}
         </section>

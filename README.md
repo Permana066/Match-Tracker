@@ -55,10 +55,10 @@ Sepakat dengan pemilik PRD, test ditulis di dua seam:
 3. Skor dihitung **manual** — tanpa deuce/selisih 2. Target skor default 21 bersifat opsional
    dan hanya menandai pemenang; skor tetap bisa dikoreksi setelah match selesai.
 4. Data hanya tersimpan di **perangkat yang sama** (`localStorage`, kunci `bultang.sesi.v1`).
-5. **Interpretasi alur akhir ronde:** setelah match terakhir diselesaikan aplikasi kembali ke
-   daftar match, tombol **Lanjut ronde** baru aktif, lalu layar *Ringkasan Ronde* menawarkan
-   **Acak ulang & lanjut ronde berikutnya** / **Selesai** (lihat rekap). Ini memenuhi kriteria
-   "tombol Lanjut ronde nonaktif sampai semua match Selesai" sekaligus alur ringkasan di PRD §5.
+5. **Alur akhir ronde:** begitu match terakhir diselesaikan, layar *Ringkasan Ronde* langsung
+   terbuka dengan pilihan **Acak ulang & lanjut ronde berikutnya** / **Selesai** (lihat rekap).
+   Pada daftar match, tombol **Lanjut ronde** hanya aktif setelah seluruh match berstatus
+   Selesai (dapat dicoba lewat tombol *Lihat daftar match* di layar ringkasan).
 6. **Klasemen** (PRD §6.5, rilis v1.1) ikut diimplementasikan karena dipakai di layar Rekap.
    *Poin* = total skor tim tempat pemain bermain; match yang belum selesai tidak dihitung.
 

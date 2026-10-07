@@ -1,6 +1,6 @@
 import { buatRonde } from './pairing'
 import { bukaMatch, rondeSelesai, selesaikanMatch, ubahSkor, type Tim } from './score'
-import type { Match, Mode, Pemain, Sesi } from './types'
+import type { Match, Mode, Pemain, Ronde, Sesi } from './types'
 import { MAKSIMAL_PEMAIN, pesanValidasiMulai } from './validation'
 
 export type Aksi =
@@ -33,6 +33,9 @@ export function sesiAwal(): Sesi {
 }
 
 const sudahDimulai = (sesi: Sesi) => sesi.ronde.length > 0
+
+export const rondeAktif = (sesi: Sesi): Ronde | undefined =>
+  sesi.ronde[sesi.rondeAktif - 1]
 
 const idBaru = (pemain: readonly Pemain[]): string => {
   const tertinggi = pemain.reduce(
@@ -90,7 +93,7 @@ export function reducer(sesi: Sesi, aksi: Aksi): Sesi {
     }
 
     case 'buka_match': {
-      const ronde = sesi.ronde[sesi.rondeAktif - 1]
+      const ronde = rondeAktif(sesi)
       if (!ronde?.match.some((m) => m.id === aksi.id)) return sesi
       return { ...ubahMatch(sesi, aksi.id, bukaMatch), layar: 'detail_skor', matchAktif: aksi.id }
     }
@@ -106,7 +109,7 @@ export function reducer(sesi: Sesi, aksi: Aksi): Sesi {
     case 'selesaikan_match': {
       if (!sesi.matchAktif) return sesi
       const setelah = ubahMatch(sesi, sesi.matchAktif, selesaikanMatch)
-      const ronde = setelah.ronde[setelah.rondeAktif - 1]
+      const ronde = rondeAktif(setelah)!
       return {
         ...setelah,
         matchAktif: null,
@@ -115,13 +118,13 @@ export function reducer(sesi: Sesi, aksi: Aksi): Sesi {
     }
 
     case 'ke_akhir_ronde': {
-      const ronde = sesi.ronde[sesi.rondeAktif - 1]
+      const ronde = rondeAktif(sesi)
       if (!ronde || !rondeSelesai(ronde)) return sesi
       return { ...sesi, layar: 'akhir_ronde', matchAktif: null }
     }
 
     case 'ronde_berikutnya': {
-      const sekarang = sesi.ronde[sesi.rondeAktif - 1]
+      const sekarang = rondeAktif(sesi)
       if (!sekarang || !rondeSelesai(sekarang)) return sesi
       const nomor = sesi.ronde.length + 1
       return {
