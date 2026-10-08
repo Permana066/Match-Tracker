@@ -32,12 +32,15 @@ const daftarRonde = (v: unknown): v is Ronde[] =>
       objek(x) && typeof x.nomor === 'number' && daftarMatch(x.match) && daftarString(x.istirahat),
   )
 
-function apakahSesi(v: unknown): v is Sesi {
+type SesiTersimpan = Omit<Sesi, 'arsipPemain'> & { arsipPemain?: Pemain[] }
+
+function apakahSesi(v: unknown): v is SesiTersimpan {
   if (!objek(v)) return false
   return (
     (v.mode === 'ganda' || v.mode === 'tunggal') &&
     typeof v.targetSkor === 'number' &&
     daftarPemain(v.pemain) &&
+    (v.arsipPemain === undefined || daftarPemain(v.arsipPemain)) &&
     daftarRonde(v.ronde) &&
     typeof v.rondeAktif === 'number' &&
     typeof v.layar === 'string' &&
@@ -58,7 +61,7 @@ export function muatSesi(): Sesi | null {
     const mentah = localStorage.getItem(KUNCI_SESI)
     if (!mentah) return null
     const data: unknown = JSON.parse(mentah)
-    return apakahSesi(data) ? data : null
+    return apakahSesi(data) ? { ...data, arsipPemain: data.arsipPemain ?? [] } : null
   } catch {
     return null
   }

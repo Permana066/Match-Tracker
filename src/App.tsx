@@ -17,9 +17,11 @@ export default function App() {
   }, [sesi])
 
   const nama = useMemo(() => {
-    const peta = new Map(sesi.pemain.map((p) => [p.id, p.nama]))
+    const peta = new Map(
+      [...sesi.arsipPemain, ...sesi.pemain].map((p) => [p.id, p.nama]),
+    )
     return (id: string) => peta.get(id) ?? id
-  }, [sesi.pemain])
+  }, [sesi.pemain, sesi.arsipPemain])
 
   const ronde = rondeAktif(sesi)
   const matchDibuka = ronde?.match.find((m) => m.id === sesi.matchAktif)

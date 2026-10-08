@@ -1,7 +1,8 @@
 # Bultang Match Tracker
 
 Web app responsif (mobile-first) untuk mabar badminton: input pemain, acak pasangan otomatis,
-catat skor dengan tombol ▲ ▼, lanjut ronde, dan lihat rekap + klasemen.
+catat skor dengan tombol ▲ ▼, lanjut ronde, dan lihat rekap + klasemen. Pemain bisa ditambah,
+diedit, atau dihapus kapan pun selama sesi berjalan lewat kartu **Kelola pemain**.
 
 Spesifikasi lengkap ada di [`PRD_Badminton_Match_Tracker.md`](./PRD_Badminton_Match_Tracker.md).
 
@@ -33,7 +34,7 @@ src/
     score.ts       # ubah skor, status match, pemenang target skor
     standings.ts   # klasemen menang/kalah/poin
     session.ts     # reducer state sesi (alur layar)
-  components/      # lima layar utama
+  components/      # layar utama + kartu bersama KelolaPemain
   storage.ts       # pembungkus localStorage (try/catch + validasi struktur)
   test/harness.ts  # helper untuk UI test
 ```
@@ -65,6 +66,12 @@ Sepakat dengan pemilik PRD, test ditulis di dua seam:
 ## Catatan implementasi
 
 - Stack: React 19 + Vite + TypeScript + Tailwind CSS 4 + Vitest/Testing Library.
+- **Kelola pemain di tengah sesi:** pemain baru langsung dimasukkan ke daftar Istirahat ronde
+  aktif sehingga match yang sedang berjalan tidak berubah, lalu diprioritaskan main di ronde
+  berikutnya. Pemain yang dihapus dipindah ke `arsipPemain` supaya nama tetap tampil di match
+  lama; hapus ditolak selama pemain masih terdaftar di match ronde ini yang belum selesai atau
+  jumlah pemain tersisa turun di bawah minimum mode. Sesi lama di `localStorage` tanpa
+  `arsipPemain` dimigrasi otomatis saat dimuat.
 - Pengacakan memakai Fisher-Yates dengan percobaan berulang: kandidat dinilai dari jumlah
   pasangan/lawan yang sama dengan ronde sebelumnya, lalu kandidat terbaik dipakai. Bila tidak
   mungkin dihindari (mis. 8 pemain ganda), ronde tetap dibuat.

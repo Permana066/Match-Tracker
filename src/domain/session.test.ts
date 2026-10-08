@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { reducer, sesiAwal } from './session'
+import { pesanHapusPemain, reducer, sesiAwal } from './session'
 import type { Sesi } from './types'
 
 const punyaPemain = (jumlah: number, tambahan: Partial<Sesi> = {}): Sesi => {
@@ -44,11 +44,95 @@ describe('reducer — setup pemain', () => {
     const s = reducer(punyaPemain(2), { type: 'edit_pemain', id: 'p1', nama: 'Andi' })
     expect(s.pemain[0].nama).toBe('Andi')
   })
+})
 
-  it('mengabaikan perubahan daftar pemain setelah sesi dimulai', () => {
+describe('reducer — kelola pemain di tengah sesi', () => {
+  it('mengizinkan menambah pemain setelah sesi dimulai', () => {
+    const s = reducer(mulai(4), { type: 'tambah_pemain', nama: 'Datang Terlambat' })
+    expect(s.pemain.map((p) => p.nama)).toContain('Datang Terlambat')
+    expect(s.pemain).toHaveLength(5)
+  })
+
+  it('menempatkan pemain baru di istirahat ronde aktif, bukan di match', () => {
+    const s = reducer(mulai(4), { type: 'tambah_pemain', nama: 'Baru' })
+    const id = s.pemain[4].id
+    expect(s.ronde[0].istirahat).toEqual([id])
+    const yangMain = s.ronde[0].match.flatMap((m) => [...m.timA, ...m.timB])
+    expect(yangMain).not.toContain(id)
+  })
+
+  it('pemain baru ikut bermain pada ronde berikutnya', () => {
+    let s = mulai(8)
+    s = reducer(s, { type: 'tambah_pemain', nama: 'Baru' })
+    const id = s.pemain[8].id
+    s = reducer(selesaikanSemuaMatch(s), { type: 'ronde_berikutnya' })
+    const diMatch = s.ronde[1].match.flatMap((m) => [...m.timA, ...m.timB])
+    expect(diMatch).toContain(id)
+    expect(s.ronde[1].istirahat).not.toContain(id)
+  })
+
+  it('mengedit nama pemain di tengah sesi', () => {
+    const s = reducer(mulai(4), { type: 'edit_pemain', id: 'p1', nama: 'Andi Saputra' })
+    expect(s.pemain[0].nama).toBe('Andi Saputra')
+  })
+
+  it('menolak menghapus pemain yang masih terdaftar di match belum selesai', () => {
     const s = mulai(4)
-    const setelah = reducer(s, { type: 'tambah_pemain', nama: 'Penyusup' })
+    expect(pesanHapusPemain(s, 'p1')).toMatch(/belum selesai/)
+    expect(reducer(s, { type: 'hapus_pemain', id: 'p1' }).pemain).toHaveLength(4)
+  })
+
+  it('mengizinkan menghapus pemain yang sedang istirahat dan mengarsipkannya', () => {
+    const s = mulai(5)
+    const istirahat = s.ronde[0].istirahat[0]
+    expect(istirahat).toBeDefined()
+
+    const setelah = reducer(s, { type: 'hapus_pemain', id: istirahat })
     expect(setelah.pemain).toHaveLength(4)
+    expect(setelah.arsipPemain.map((p) => p.id)).toEqual([istirahat])
+    expect(setelah.ronde[0].istirahat).not.toContain(istirahat)
+  })
+
+  it('mempertahankan nama pemain terhapus untuk match lama', () => {
+    const s = mulai(5)
+    const istirahat = s.ronde[0].istirahat[0]
+    const nama = s.pemain.find((p) => p.id === istirahat)!.nama
+    const setelah = reducer(s, { type: 'hapus_pemain', id: istirahat })
+    expect(setelah.arsipPemain.map((p) => p.nama)).toEqual([nama])
+    expect(setelah.pemain.some((p) => p.id === istirahat)).toBe(false)
+  })
+
+  it('menolak menghapus pemain sampai di bawah jumlah minimum mode', () => {
+    const s = selesaikanSemuaMatch(mulai(4))
+    expect(pesanHapusPemain(s, 'p1')).toMatch(/Minimal 4/)
+    expect(reducer(s, { type: 'hapus_pemain', id: 'p1' }).pemain).toHaveLength(4)
+  })
+
+  it('mengizinkan menghapus pemain setelah match ronde ini selesai', () => {
+    const s = selesaikanSemuaMatch(mulai(5))
+    const istirahat = s.ronde[0].istirahat[0]
+    const pemainMatch = s.ronde[0].match[0].timA[0]
+    expect(pesanHapusPemain(s, pemainMatch)).toBeNull()
+
+    const setelah = reducer(s, { type: 'hapus_pemain', id: pemainMatch })
+    expect(setelah.pemain.map((p) => p.id)).not.toContain(pemainMatch)
+    expect(setelah.arsipPemain.map((p) => p.id)).toContain(pemainMatch)
+    expect(setelah.ronde[0].istirahat).toEqual([istirahat])
+  })
+
+  it('id pemain baru tidak bentrok dengan id yang sudah diarsipkan', () => {
+    let s = selesaikanSemuaMatch(mulai(5))
+    s = reducer(s, { type: 'hapus_pemain', id: 'p5' })
+    s = reducer(s, { type: 'tambah_pemain', nama: 'Pengganti' })
+
+    expect(s.pemain.map((p) => p.id)).not.toContain('p5')
+    const semuaId = [...s.pemain, ...s.arsipPemain].map((p) => p.id)
+    expect(new Set(semuaId).size).toBe(semuaId.length)
+    expect(s.pemain.map((p) => p.id)).toContain('p6')
+  })
+
+  it('pesan hapus kosong sebelum sesi dimulai', () => {
+    expect(pesanHapusPemain(punyaPemain(4), 'p1')).toBeNull()
   })
 })
 

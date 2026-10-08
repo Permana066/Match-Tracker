@@ -47,6 +47,8 @@ Boleh diganti sesuai preferensi agent, selama kebutuhan di dokumen ini terpenuhi
 
 - Tambah nama lewat input teks dan tombol **Tambah** (atau tekan Enter).
 - Hapus atau edit nama sebelum mulai.
+- **Selama sesi berjalan**, kartu **Kelola pemain** di layar Daftar Match memungkinkan
+  tambah/edit/hapus pemain tanpa mengulang sesi (lihat §9).
 - Validasi:
   - Nama tidak boleh kosong (abaikan spasi di awal/akhir).
   - Nama tidak boleh duplikat (tidak peka huruf besar/kecil).
@@ -142,7 +144,12 @@ Alur status: `belum_main` → `sedang_main` → `selesai`.
 - Satu pemain hanya boleh ada di satu match dalam satu ronde.
 - Pengacakan tidak boleh mengubah match yang sudah berstatus `selesai`.
 - Skor yang diedit setelah match selesai harus ikut memperbarui klasemen.
-- Mengubah daftar pemain tidak diizinkan setelah sesi dimulai (v1).
+- Daftar pemain boleh diubah kapan pun lewat kartu **Kelola pemain** di layar Daftar Match.
+- Pemain baru langsung masuk daftar **Istirahat** ronde aktif (match yang sedang berjalan tidak
+  berubah), lalu diprioritaskan main di ronde berikutnya.
+- Pemain hanya bisa dihapus jika tidak terdaftar di match ronde aktif yang belum selesai, dan
+  jumlah pemain tidak turun di bawah minimum mode.
+- Pemain yang dihapus diarsipkan agar namanya tetap tampil di match lama dan rekap.
 
 ## 10. Kebutuhan Non-Fungsional
 
@@ -161,6 +168,9 @@ Alur status: `belum_main` → `sedang_main` → `selesai`.
 - [ ] Tombol ▼ pada skor 0 tidak membuat skor negatif.
 - [ ] Tombol **Lanjut ronde** nonaktif sampai semua match berstatus Selesai.
 - [ ] Setelah **Acak ulang & lanjut**, pemain yang istirahat di ronde sebelumnya ikut bermain.
+- [ ] Menambah pemain di tengah sesi membuatnya masuk Istirahat ronde ini dan ikut main di
+      ronde berikutnya, tanpa skor/match yang sudah ada hilang.
+- [ ] Menghapus pemain yang masih terdaftar di match belum selesai ditolak dengan pesan jelas.
 - [ ] Refresh halaman tidak menghilangkan data sesi.
 - [ ] Match yang sudah selesai bisa diedit skornya.
 - [ ] Layout tetap rapi di lebar 360px dan di desktop.

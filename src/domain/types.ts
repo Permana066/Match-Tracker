@@ -28,6 +28,7 @@ export interface Sesi {
   mode: Mode
   targetSkor: number
   pemain: Pemain[]
+  arsipPemain: Pemain[]
   ronde: Ronde[]
   rondeAktif: number
   layar: Layar

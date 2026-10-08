@@ -1,8 +1,8 @@
-import { useState, type FormEvent } from 'react'
 import type { Sesi } from '../domain/types'
 import type { Aksi } from '../domain/session'
-import { MAKSIMAL_PEMAIN, pesanValidasiMulai, validasiNamaBaru } from '../domain/validation'
-import { KELAS_KARTU, KELAS_TOMBOL_SEKUNDER, KELAS_TOMBOL_UTAMA, LABEL_MODE } from '../ui'
+import { pesanValidasiMulai } from '../domain/validation'
+import { KELAS_KARTU, KELAS_TOMBOL_UTAMA, LABEL_MODE } from '../ui'
+import { KelolaPemain } from './KelolaPemain'
 
 interface Props {
   sesi: Sesi
@@ -10,41 +10,7 @@ interface Props {
 }
 
 export function SetupScreen({ sesi, dispatch }: Props) {
-  const [namaInput, setNamaInput] = useState('')
-  const [idEdit, setIdEdit] = useState<string | null>(null)
-  const [pesan, setPesan] = useState<string | null>(null)
-
-  const sedangEdit = idEdit !== null
-  const penuh = sesi.pemain.length >= MAKSIMAL_PEMAIN
   const pesanMulai = pesanValidasiMulai(sesi.pemain.length, sesi.mode)
-
-  const simpan = (event: FormEvent) => {
-    event.preventDefault()
-    if (penuh && !sedangEdit) {
-      setPesan(`Maksimal ${MAKSIMAL_PEMAIN} pemain.`)
-      return
-    }
-    const lain = sesi.pemain.filter((p) => p.id !== idEdit).map((p) => p.nama)
-    const hasil = validasiNamaBaru(namaInput, lain)
-    if (!hasil.ok) {
-      setPesan(hasil.pesan)
-      return
-    }
-    if (sedangEdit) {
-      dispatch({ type: 'edit_pemain', id: idEdit, nama: hasil.nama })
-      setIdEdit(null)
-    } else {
-      dispatch({ type: 'tambah_pemain', nama: hasil.nama })
-    }
-    setNamaInput('')
-    setPesan(null)
-  }
-
-  const batalEdit = () => {
-    setIdEdit(null)
-    setNamaInput('')
-    setPesan(null)
-  }
 
   return (
     <div className="mx-auto flex w-full max-w-xl flex-col gap-6">
@@ -93,78 +59,7 @@ export function SetupScreen({ sesi, dispatch }: Props) {
         </p>
       </section>
 
-      <section className={KELAS_KARTU}>
-        <h2 className="mb-3 text-lg font-bold">Pemain ({sesi.pemain.length}/{MAKSIMAL_PEMAIN})</h2>
-
-        <form onSubmit={simpan} noValidate className="mb-4 flex flex-col gap-2 sm:flex-row">
-          <div className="flex-1">
-            <label htmlFor="nama-pemain" className="mb-1 block text-sm font-semibold text-slate-600 dark:text-slate-300">
-              Nama pemain
-            </label>
-            <input
-              id="nama-pemain"
-              value={namaInput}
-              onChange={(e) => setNamaInput(e.target.value)}
-              placeholder="Contoh: Andi"
-              autoComplete="off"
-              className="h-11 w-full rounded-xl border border-slate-300 bg-transparent px-3 text-base dark:border-slate-600"
-            />
-          </div>
-          <div className="flex items-end gap-2">
-            <button type="submit" className={KELAS_TOMBOL_UTAMA}>
-              {sedangEdit ? 'Simpan' : 'Tambah'}
-            </button>
-            {sedangEdit && (
-              <button type="button" onClick={batalEdit} className={KELAS_TOMBOL_SEKUNDER}>
-                Batal
-              </button>
-            )}
-          </div>
-        </form>
-
-        {pesan && (
-          <p role="alert" className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-700 dark:bg-red-900/50 dark:text-red-300">
-            {pesan}
-          </p>
-        )}
-
-        {sesi.pemain.length > 0 ? (
-          <ul className="flex flex-col gap-2">
-            {sesi.pemain.map((p) => (
-              <li
-                key={p.id}
-                className="flex min-h-11 items-center justify-between gap-2 rounded-xl bg-slate-50 px-3 py-2 dark:bg-slate-800"
-              >
-                <span className="min-w-0 flex-1 truncate font-medium">{p.nama}</span>
-                <span className="flex gap-2">
-                  <button
-                    type="button"
-                    aria-label={`Edit ${p.nama}`}
-                    onClick={() => {
-                      setIdEdit(p.id)
-                      setNamaInput(p.nama)
-                      setPesan(null)
-                    }}
-                    className="min-h-11 rounded-lg px-3 text-sm font-semibold text-teal-700 hover:bg-teal-50 dark:text-teal-300 dark:hover:bg-teal-900/60"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    aria-label={`Hapus ${p.nama}`}
-                    onClick={() => dispatch({ type: 'hapus_pemain', id: p.id })}
-                    className="min-h-11 rounded-lg px-3 text-sm font-semibold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/40"
-                  >
-                    Hapus
-                  </button>
-                </span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-sm text-slate-500 dark:text-slate-400">Belum ada pemain. Tambahkan minimal 4 nama.</p>
-        )}
-      </section>
+      <KelolaPemain sesi={sesi} dispatch={dispatch} konteks="setup" />
 
       <section className={KELAS_KARTU}>
         <p role="status" className="mb-3 text-sm font-medium text-amber-700 dark:text-amber-400">

@@ -2,6 +2,7 @@ import { rondeAktif, type Aksi } from '../domain/session'
 import { rondeSelesai } from '../domain/score'
 import type { Sesi } from '../domain/types'
 import { KELAS_KARTU, KELAS_TOMBOL_SEKUNDER, KELAS_TOMBOL_UTAMA, LABEL_STATUS } from '../ui'
+import { KelolaPemain } from './KelolaPemain'
 
 interface Props {
   sesi: Sesi
@@ -83,6 +84,8 @@ export function DaftarMatchScreen({ sesi, dispatch, nama }: Props) {
           </p>
         </section>
       )}
+
+      <KelolaPemain sesi={sesi} dispatch={dispatch} konteks="sesi" />
 
       <button
         type="button"

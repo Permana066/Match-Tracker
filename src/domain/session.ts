@@ -26,6 +26,7 @@ export function sesiAwal(): Sesi {
     mode: 'ganda',
     targetSkor: 21,
     pemain: [],
+    arsipPemain: [],
     ronde: [],
     rondeAktif: 0,
     layar: 'beranda',
@@ -38,12 +39,24 @@ const sudahDimulai = (sesi: Sesi) => sesi.ronde.length > 0
 export const rondeAktif = (sesi: Sesi): Ronde | undefined =>
   sesi.ronde[sesi.rondeAktif - 1]
 
-const idBaru = (pemain: readonly Pemain[]): string => {
-  const tertinggi = pemain.reduce(
+const idBaru = (dikenal: readonly Pemain[]): string => {
+  const tertinggi = dikenal.reduce(
     (maks, p) => Math.max(maks, Number(p.id.replace(/^p/, '')) || 0),
     0,
   )
   return `p${tertinggi + 1}`
+}
+
+export function pesanHapusPemain(sesi: Sesi, id: string): string | null {
+  if (!sudahDimulai(sesi)) return null
+  const ronde = rondeAktif(sesi)
+  const masihIkutMatch = ronde?.match.some(
+    (m) => m.status !== 'selesai' && [...m.timA, ...m.timB].includes(id),
+  )
+  if (masihIkutMatch) {
+    return 'Pemain ini masih terdaftar di match ronde ini yang belum selesai. Tunggu sampai match-nya selesai.'
+  }
+  return pesanValidasiMulai(sesi.pemain.length - 1, sesi.mode)
 }
 
 function ubahMatch(sesi: Sesi, id: string, ubah: (match: Match) => Match): Sesi {
@@ -68,22 +81,41 @@ export function reducer(sesi: Sesi, aksi: Aksi): Sesi {
     case 'set_target_skor':
       return sudahDimulai(sesi) ? sesi : { ...sesi, targetSkor: aksi.targetSkor }
 
-    case 'tambah_pemain':
-      if (sudahDimulai(sesi) || sesi.pemain.length >= MAKSIMAL_PEMAIN) return sesi
-      return { ...sesi, pemain: [...sesi.pemain, { id: idBaru(sesi.pemain), nama: aksi.nama }] }
+    case 'tambah_pemain': {
+      if (sesi.pemain.length >= MAKSIMAL_PEMAIN) return sesi
+      const id = idBaru([...sesi.pemain, ...sesi.arsipPemain])
+      const pemain = [...sesi.pemain, { id, nama: aksi.nama }]
+      if (!sudahDimulai(sesi)) return { ...sesi, pemain }
+      return {
+        ...sesi,
+        pemain,
+        ronde: sesi.ronde.map((ronde, i) =>
+          i === sesi.rondeAktif - 1 ? { ...ronde, istirahat: [...ronde.istirahat, id] } : ronde,
+        ),
+      }
+    }
 
-    case 'hapus_pemain':
-      return sudahDimulai(sesi)
-        ? sesi
-        : { ...sesi, pemain: sesi.pemain.filter((p) => p.id !== aksi.id) }
+    case 'hapus_pemain': {
+      if (pesanHapusPemain(sesi, aksi.id)) return sesi
+      const keluar = sesi.pemain.find((p) => p.id === aksi.id)
+      const ronde = sudahDimulai(sesi)
+        ? sesi.ronde.map((r, i) =>
+            i === sesi.rondeAktif - 1 ? { ...r, istirahat: r.istirahat.filter((x) => x !== aksi.id) } : r,
+          )
+        : sesi.ronde
+      return {
+        ...sesi,
+        pemain: sesi.pemain.filter((p) => p.id !== aksi.id),
+        arsipPemain: keluar ? [...sesi.arsipPemain, keluar] : sesi.arsipPemain,
+        ronde,
+      }
+    }
 
     case 'edit_pemain':
-      return sudahDimulai(sesi)
-        ? sesi
-        : {
-            ...sesi,
-            pemain: sesi.pemain.map((p) => (p.id === aksi.id ? { ...p, nama: aksi.nama } : p)),
-          }
+      return {
+        ...sesi,
+        pemain: sesi.pemain.map((p) => (p.id === aksi.id ? { ...p, nama: aksi.nama } : p)),
+      }
 
     case 'mulai': {
       if (pesanValidasiMulai(sesi.pemain.length, sesi.mode)) return sesi

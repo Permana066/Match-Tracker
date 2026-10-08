@@ -40,6 +40,14 @@ describe('penyimpanan sesi', () => {
     expect(muatSesi()).toBeNull()
   })
 
+  it('memulihkan sesi lama yang belum punya arsipPemain', () => {
+    const sesi = sesiContoh()
+    const lama: Record<string, unknown> = { ...sesi }
+    delete lama.arsipPemain
+    localStorage.setItem(KUNCI_SESI, JSON.stringify(lama))
+    expect(muatSesi()).toEqual({ ...sesi, arsipPemain: [] })
+  })
+
   it('tetap aman saat localStorage tidak bisa diakses', () => {
     const asli = Storage.prototype.setItem
     Storage.prototype.setItem = () => {

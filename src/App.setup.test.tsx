@@ -158,15 +158,60 @@ describe('layar setup — memulai sesi', () => {
     const teksMatch = kartu.map((k) => k.textContent).join(' ')
     expect(teksMatch).not.toContain(yangIstirahat![0])
   })
+})
 
-  it('mengubah daftar pemain tidak diizinkan setelah sesi dimulai', async () => {
+describe('kelola pemain di tengah sesi', () => {
+  it('menyediakan kelola pemain di layar daftar match setelah sesi dimulai', async () => {
     const pengguna = userEvent.setup()
     await bukaAplikasi(pengguna)
     await mulaiSesi(pengguna, ['P1', 'P2', 'P3', 'P4'])
     await waitFor(() => expect(screen.getAllByRole('article')).toHaveLength(1))
 
-    expect(screen.queryByLabelText('Nama pemain')).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Tambah' })).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Kelola pemain (4/30)' })).toBeInTheDocument()
+    expect(screen.getByLabelText('Nama pemain')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Tambah' })).toBeInTheDocument()
+  })
+
+  it('menambah pemain baru di tengah sesi tanpa mengulang sesi', async () => {
+    const pengguna = userEvent.setup()
+    await bukaAplikasi(pengguna)
+    await mulaiSesi(pengguna, ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8'])
+    await waitFor(() => expect(screen.getAllByRole('article')).toHaveLength(2))
+
+    await tambahPemain(pengguna, 'P9')
+
+    expect(screen.getByRole('heading', { name: 'Kelola pemain (9/30)' })).toBeInTheDocument()
+    expect(screen.getAllByRole('article')).toHaveLength(2)
+
+    const istirahat = screen.getByText('Istirahat').closest('section')
+    expect(istirahat).toHaveTextContent('P9')
+  })
+
+  it('menolak menghapus pemain yang masih terdaftar di match belum selesai', async () => {
+    const pengguna = userEvent.setup()
+    await bukaAplikasi(pengguna)
+    await mulaiSesi(pengguna, ['P1', 'P2', 'P3', 'P4'])
+    await waitFor(() => expect(screen.getAllByRole('article')).toHaveLength(1))
+
+    await pengguna.click(screen.getByRole('button', { name: 'Hapus P1' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent(/belum selesai/)
+    expect(screen.getByRole('heading', { name: 'Kelola pemain (4/30)' })).toBeInTheDocument()
+  })
+
+  it('bisa mengedit nama pemain di tengah sesi', async () => {
+    const pengguna = userEvent.setup()
+    await bukaAplikasi(pengguna)
+    await mulaiSesi(pengguna, ['P1', 'P2', 'P3', 'P4'])
+    await waitFor(() => expect(screen.getAllByRole('article')).toHaveLength(1))
+
+    await pengguna.click(screen.getByRole('button', { name: 'Edit P1' }))
+    const kolom = screen.getByLabelText('Nama pemain')
+    await pengguna.clear(kolom)
+    await pengguna.type(kolom, 'Pemenang')
+    await pengguna.click(screen.getByRole('button', { name: 'Simpan' }))
+
+    expect(screen.getByLabelText('Edit Pemenang')).toBeInTheDocument()
+    expect(screen.queryByLabelText('Edit P1')).not.toBeInTheDocument()
   })
 })
 
