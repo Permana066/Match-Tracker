@@ -1,7 +1,18 @@
-import { screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import App from '../App'
 
 export type Pengguna = ReturnType<typeof userEvent.setup>
+
+export async function bukaAplikasi(pengguna: Pengguna) {
+  const hasil = render(<App />)
+  await lewatiBeranda(pengguna)
+  return hasil
+}
+
+export async function lewatiBeranda(pengguna: Pengguna): Promise<void> {
+  await pengguna.click(screen.getByRole('button', { name: 'Mulai' }))
+}
 
 export const inputNama = () => screen.getByLabelText('Nama pemain')
 

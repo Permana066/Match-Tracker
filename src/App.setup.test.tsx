@@ -3,28 +3,62 @@ import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it } from 'vitest'
 import App from './App'
 import { KUNCI_SESI } from './storage'
-import { inputNama, mulaiSesi, tambahBanyak, tambahPemain } from './test/harness'
+import { inputNama, bukaAplikasi, mulaiSesi, tambahBanyak, tambahPemain } from './test/harness'
 
 beforeEach(() => localStorage.clear())
+
+describe('layar beranda', () => {
+  it('menampilkan judul, tagline, dan tombol Mulai tanpa chrome aplikasi', () => {
+    render(<App />)
+    expect(screen.getByRole('heading', { name: 'Match Tracker Bulutangkis' })).toBeInTheDocument()
+    expect(screen.getByText('Acak pasangan, catat skor tiap ronde, dan lihat rekap + klasemen — semua dari satu layar.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Mulai' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Mulai sesi baru' })).not.toBeInTheDocument()
+  })
+
+  it('tombol Mulai mengarahkan ke layar setup untuk pilih mode dan isi nama', async () => {
+    const pengguna = userEvent.setup()
+    render(<App />)
+    await pengguna.click(screen.getByRole('button', { name: 'Mulai' }))
+
+    expect(screen.getByLabelText('Nama pemain')).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: 'Ganda' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: 'Tunggal' })).toBeInTheDocument()
+    expect(localStorage.getItem('bultang.sesi.v1')).toContain('"layar":"setup"')
+  })
+
+  it('tombol tema mengganti mode gelap/terang dan menyimpan preferensi', async () => {
+    const pengguna = userEvent.setup()
+    render(<App />)
+
+    await pengguna.click(screen.getByRole('button', { name: 'Aktifkan mode gelap' }))
+    expect(document.documentElement).toHaveClass('dark')
+    expect(localStorage.getItem('bultang.tema')).toBe('gelap')
+
+    await pengguna.click(screen.getByRole('button', { name: 'Aktifkan mode terang' }))
+    expect(document.documentElement).not.toHaveClass('dark')
+    expect(localStorage.getItem('bultang.tema')).toBe('terang')
+  })
+})
 
 describe('layar setup — input pemain', () => {
   it('menambahkan pemain lewat tombol Tambah', async () => {
     const pengguna = userEvent.setup()
-    render(<App />)
+    await bukaAplikasi(pengguna)
     await tambahPemain(pengguna, 'Andi')
     expect(screen.getByRole('listitem')).toHaveTextContent('Andi')
   })
 
   it('menambahkan pemain dengan menekan Enter', async () => {
     const pengguna = userEvent.setup()
-    render(<App />)
+    await bukaAplikasi(pengguna)
     await pengguna.type(inputNama(), 'Budi{Enter}')
     expect(screen.getByRole('listitem')).toHaveTextContent('Budi')
   })
 
   it('menolak nama kosong dengan pesan yang jelas', async () => {
     const pengguna = userEvent.setup()
-    render(<App />)
+    await bukaAplikasi(pengguna)
     await pengguna.click(screen.getByRole('button', { name: 'Tambah' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('Nama tidak boleh kosong.')
     expect(screen.queryByRole('listitem')).not.toBeInTheDocument()
@@ -32,7 +66,7 @@ describe('layar setup — input pemain', () => {
 
   it('menolak nama duplikat tanpa memperhatikan huruf besar/kecil', async () => {
     const pengguna = userEvent.setup()
-    render(<App />)
+    await bukaAplikasi(pengguna)
     await tambahPemain(pengguna, 'Andi')
     await tambahPemain(pengguna, 'aNDI')
     expect(await screen.findByRole('alert')).toHaveTextContent('sudah terdaftar')
@@ -41,7 +75,7 @@ describe('layar setup — input pemain', () => {
 
   it('bisa mengedit nama sebelum mulai', async () => {
     const pengguna = userEvent.setup()
-    render(<App />)
+    await bukaAplikasi(pengguna)
     await tambahPemain(pengguna, 'Andi')
     await pengguna.click(screen.getByRole('button', { name: 'Edit Andi' }))
     const kolom = screen.getByLabelText('Nama pemain')
@@ -53,7 +87,7 @@ describe('layar setup — input pemain', () => {
 
   it('bisa menghapus nama sebelum mulai', async () => {
     const pengguna = userEvent.setup()
-    render(<App />)
+    await bukaAplikasi(pengguna)
     await tambahBanyak(pengguna, ['Andi', 'Budi'])
     await pengguna.click(screen.getByRole('button', { name: 'Hapus Andi' }))
     expect(screen.queryByRole('listitem', { name: /Andi/ })).not.toBeInTheDocument()
@@ -64,7 +98,7 @@ describe('layar setup — input pemain', () => {
 describe('layar setup — validasi tombol Mulai', () => {
   it('nonaktif sampai minimal 4 pemain pada mode Ganda', async () => {
     const pengguna = userEvent.setup()
-    render(<App />)
+    await bukaAplikasi(pengguna)
     const tombolMulai = screen.getByRole('button', { name: 'Mulai' })
     expect(tombolMulai).toBeDisabled()
 
@@ -77,7 +111,7 @@ describe('layar setup — validasi tombol Mulai', () => {
 
   it('mengaktifkan Mulai dengan 2 pemain setelah mode Tunggal dipilih', async () => {
     const pengguna = userEvent.setup()
-    render(<App />)
+    await bukaAplikasi(pengguna)
     await tambahBanyak(pengguna, ['P1', 'P2'])
     expect(screen.getByRole('button', { name: 'Mulai' })).toBeDisabled()
 
@@ -87,7 +121,7 @@ describe('layar setup — validasi tombol Mulai', () => {
 
   it('menampilkan pesan kekurangan pemain', async () => {
     const pengguna = userEvent.setup()
-    render(<App />)
+    await bukaAplikasi(pengguna)
     await tambahBanyak(pengguna, ['P1', 'P2', 'P3'])
     expect(await screen.findByText('Minimal 4 pemain untuk mode Ganda.')).toBeInTheDocument()
   })
@@ -96,7 +130,7 @@ describe('layar setup — validasi tombol Mulai', () => {
 describe('layar setup — memulai sesi', () => {
   it('8 pemain mode Ganda menghasilkan 2 match dengan tiap pemain tepat sekali', async () => {
     const pengguna = userEvent.setup()
-    render(<App />)
+    await bukaAplikasi(pengguna)
     const nama = ['Aldi', 'Bagas', 'Citra', 'Dewi', 'Eka', 'Fajar', 'Gani', 'Hana']
     await mulaiSesi(pengguna, nama)
 
@@ -111,7 +145,7 @@ describe('layar setup — memulai sesi', () => {
 
   it('9 pemain mode Ganda menyisakan 1 pemain di daftar Istirahat', async () => {
     const pengguna = userEvent.setup()
-    render(<App />)
+    await bukaAplikasi(pengguna)
     await mulaiSesi(pengguna, ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9'])
 
     const daftarIstirahat = await screen.findByText('Istirahat')
@@ -127,7 +161,7 @@ describe('layar setup — memulai sesi', () => {
 
   it('mengubah daftar pemain tidak diizinkan setelah sesi dimulai', async () => {
     const pengguna = userEvent.setup()
-    render(<App />)
+    await bukaAplikasi(pengguna)
     await mulaiSesi(pengguna, ['P1', 'P2', 'P3', 'P4'])
     await waitFor(() => expect(screen.getAllByRole('article')).toHaveLength(1))
 
@@ -139,7 +173,7 @@ describe('layar setup — memulai sesi', () => {
 describe('localStorage — layar terakhir dipulihkan', () => {
   it('membuka kembali layar daftar match setelah refresh', async () => {
     const pengguna = userEvent.setup()
-    const pertama = render(<App />)
+    const pertama = await bukaAplikasi(pengguna)
     await mulaiSesi(pengguna, ['P1', 'P2', 'P3', 'P4', 'P5'])
     await waitFor(() => expect(screen.getAllByRole('article')).toHaveLength(1))
     expect(localStorage.getItem(KUNCI_SESI)).toContain('daftar_match')

@@ -2,7 +2,7 @@ export type Mode = 'ganda' | 'tunggal'
 
 export type StatusMatch = 'belum_main' | 'sedang_main' | 'selesai'
 
-export type Layar = 'setup' | 'daftar_match' | 'detail_skor' | 'akhir_ronde' | 'rekap'
+export type Layar = 'beranda' | 'setup' | 'daftar_match' | 'detail_skor' | 'akhir_ronde' | 'rekap'
 
 export interface Pemain {
   id: string

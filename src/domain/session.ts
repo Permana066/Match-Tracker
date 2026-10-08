@@ -4,6 +4,7 @@ import type { Match, Mode, Pemain, Ronde, Sesi } from './types'
 import { MAKSIMAL_PEMAIN, pesanValidasiMulai } from './validation'
 
 export type Aksi =
+  | { type: 'ke_setup' }
   | { type: 'set_mode'; mode: Mode }
   | { type: 'set_target_skor'; targetSkor: number }
   | { type: 'tambah_pemain'; nama: string }
@@ -27,7 +28,7 @@ export function sesiAwal(): Sesi {
     pemain: [],
     ronde: [],
     rondeAktif: 0,
-    layar: 'setup',
+    layar: 'beranda',
     matchAktif: null,
   }
 }
@@ -58,6 +59,9 @@ function ubahMatch(sesi: Sesi, id: string, ubah: (match: Match) => Match): Sesi 
 
 export function reducer(sesi: Sesi, aksi: Aksi): Sesi {
   switch (aksi.type) {
+    case 'ke_setup':
+      return sesi.layar === 'beranda' ? { ...sesi, layar: 'setup' } : sesi
+
     case 'set_mode':
       return sudahDimulai(sesi) ? sesi : { ...sesi, mode: aksi.mode }
 

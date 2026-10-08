@@ -27,11 +27,11 @@ function PanelTim({
 }) {
   return (
     <section className={KELAS_KARTU} aria-label={`Tim ${namaTim}`}>
-      <p className="text-xs font-bold uppercase tracking-wide text-slate-400">{judul}</p>
+      <p className="text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-slate-500">{judul}</p>
       <p className="mb-3 font-medium">{anggota.join(', ')}</p>
       <p
         data-testid={`skor-tim-${namaTim.toLowerCase()}`}
-        className="mb-4 text-center text-7xl font-black tabular-nums text-slate-900"
+        className="mb-4 text-center text-7xl font-black tabular-nums text-slate-900 dark:text-white"
       >
         {skor}
       </p>
@@ -41,7 +41,7 @@ function PanelTim({
           aria-label={`Kurangi skor Tim ${namaTim}`}
           disabled={nonaktif}
           onClick={() => onUbah(-1)}
-          className="flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-300 bg-white text-2xl font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+          className="flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-300 bg-white text-2xl font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
         >
           ▼
         </button>
@@ -50,7 +50,7 @@ function PanelTim({
           aria-label={`Tambah skor Tim ${namaTim}`}
           disabled={nonaktif}
           onClick={() => onUbah(1)}
-          className="flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-700 text-2xl font-bold text-white shadow-sm transition hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-40"
+          className="flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-700 text-2xl font-bold text-white shadow-sm transition hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-teal-600"
         >
           ▲
         </button>
@@ -73,16 +73,16 @@ export function SkorScreen({ sesi, dispatch, nama }: Props) {
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-4">
       <header className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <p className="text-sm font-medium text-slate-500">Ronde {ronde.nomor}</p>
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Ronde {ronde.nomor}</p>
           <h1 className="text-2xl font-bold">Match {indeks + 1}</h1>
         </div>
-        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">
+        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600 dark:bg-slate-700 dark:text-slate-300">
           {LABEL_STATUS[match.status]}
         </span>
       </header>
 
       {terkunci && (
-        <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800">
+        <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
           Match sudah selesai. Tekan <strong>Edit skor</strong> bila ingin mengoreksi.
         </p>
       )}
@@ -106,7 +106,7 @@ export function SkorScreen({ sesi, dispatch, nama }: Props) {
         />
       </div>
 
-      <p role="status" className="min-h-6 text-center font-semibold text-teal-800">
+      <p role="status" className="min-h-6 text-center font-semibold text-teal-800 dark:text-teal-300">
         {menang ? `Tim ${menang} mencapai target skor ${sesi.targetSkor}` : ''}
       </p>
 

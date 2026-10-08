@@ -11,6 +11,13 @@
     <title>Bultang Match Tracker</title>
   </head>
   <body>
+    <script>
+      try {
+        var t = localStorage.getItem('bultang.tema')
+        var gelap = t === 'gelap' || (t !== 'terang' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+        if (gelap) document.documentElement.classList.add('dark')
+      } catch (e) {}
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

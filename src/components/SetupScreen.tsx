@@ -50,15 +50,17 @@ export function SetupScreen({ sesi, dispatch }: Props) {
     <div className="mx-auto flex w-full max-w-xl flex-col gap-6">
       <section className={KELAS_KARTU}>
         <fieldset className="mb-5">
-          <legend className="mb-2 text-sm font-semibold text-slate-600">Mode permainan</legend>
+          <legend className="mb-2 text-sm font-semibold text-slate-600 dark:text-slate-300">
+            Mode permainan
+          </legend>
           <div className="flex gap-3">
             {(Object.keys(LABEL_MODE) as Array<keyof typeof LABEL_MODE>).map((mode) => (
               <label
                 key={mode}
                 className={`min-h-11 flex-1 cursor-pointer rounded-xl border px-4 py-3 text-center font-semibold shadow-sm ${
                   sesi.mode === mode
-                    ? 'border-teal-700 bg-teal-50 text-teal-800'
-                    : 'border-slate-300 bg-white text-slate-600'
+                    ? 'border-teal-700 bg-teal-50 text-teal-800 dark:border-teal-500 dark:bg-teal-900/60 dark:text-teal-300'
+                    : 'border-slate-300 bg-white text-slate-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300'
                 }`}
               >
                 <input
@@ -74,7 +76,7 @@ export function SetupScreen({ sesi, dispatch }: Props) {
           </div>
         </fieldset>
 
-        <label htmlFor="target-skor" className="mb-1 block text-sm font-semibold text-slate-600">
+        <label htmlFor="target-skor" className="mb-1 block text-sm font-semibold text-slate-600 dark:text-slate-300">
           Target skor (opsional)
         </label>
         <input
@@ -84,9 +86,9 @@ export function SetupScreen({ sesi, dispatch }: Props) {
           max={99}
           value={sesi.targetSkor}
           onChange={(e) => dispatch({ type: 'set_target_skor', targetSkor: Number(e.target.value) })}
-          className="mb-1 h-11 w-24 rounded-xl border border-slate-300 px-3 text-center text-lg font-semibold"
+          className="mb-1 h-11 w-24 rounded-xl border border-slate-300 bg-transparent px-3 text-center text-lg font-semibold dark:border-slate-600"
         />
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-slate-500 dark:text-slate-400">
           Skor tetap bisa dikoreksi, aturan deuce tidak dipakai.
         </p>
       </section>
@@ -96,7 +98,7 @@ export function SetupScreen({ sesi, dispatch }: Props) {
 
         <form onSubmit={simpan} noValidate className="mb-4 flex flex-col gap-2 sm:flex-row">
           <div className="flex-1">
-            <label htmlFor="nama-pemain" className="mb-1 block text-sm font-semibold text-slate-600">
+            <label htmlFor="nama-pemain" className="mb-1 block text-sm font-semibold text-slate-600 dark:text-slate-300">
               Nama pemain
             </label>
             <input
@@ -105,7 +107,7 @@ export function SetupScreen({ sesi, dispatch }: Props) {
               onChange={(e) => setNamaInput(e.target.value)}
               placeholder="Contoh: Andi"
               autoComplete="off"
-              className="h-11 w-full rounded-xl border border-slate-300 px-3 text-base"
+              className="h-11 w-full rounded-xl border border-slate-300 bg-transparent px-3 text-base dark:border-slate-600"
             />
           </div>
           <div className="flex items-end gap-2">
@@ -121,7 +123,7 @@ export function SetupScreen({ sesi, dispatch }: Props) {
         </form>
 
         {pesan && (
-          <p role="alert" className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
+          <p role="alert" className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-700 dark:bg-red-900/50 dark:text-red-300">
             {pesan}
           </p>
         )}
@@ -131,7 +133,7 @@ export function SetupScreen({ sesi, dispatch }: Props) {
             {sesi.pemain.map((p) => (
               <li
                 key={p.id}
-                className="flex min-h-11 items-center justify-between gap-2 rounded-xl bg-slate-50 px-3 py-2"
+                className="flex min-h-11 items-center justify-between gap-2 rounded-xl bg-slate-50 px-3 py-2 dark:bg-slate-800"
               >
                 <span className="min-w-0 flex-1 truncate font-medium">{p.nama}</span>
                 <span className="flex gap-2">
@@ -143,7 +145,7 @@ export function SetupScreen({ sesi, dispatch }: Props) {
                       setNamaInput(p.nama)
                       setPesan(null)
                     }}
-                    className="min-h-11 rounded-lg px-3 text-sm font-semibold text-teal-700 hover:bg-teal-50"
+                    className="min-h-11 rounded-lg px-3 text-sm font-semibold text-teal-700 hover:bg-teal-50 dark:text-teal-300 dark:hover:bg-teal-900/60"
                   >
                     Edit
                   </button>
@@ -151,7 +153,7 @@ export function SetupScreen({ sesi, dispatch }: Props) {
                     type="button"
                     aria-label={`Hapus ${p.nama}`}
                     onClick={() => dispatch({ type: 'hapus_pemain', id: p.id })}
-                    className="min-h-11 rounded-lg px-3 text-sm font-semibold text-red-600 hover:bg-red-50"
+                    className="min-h-11 rounded-lg px-3 text-sm font-semibold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/40"
                   >
                     Hapus
                   </button>
@@ -160,12 +162,12 @@ export function SetupScreen({ sesi, dispatch }: Props) {
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-slate-500">Belum ada pemain. Tambahkan minimal 4 nama.</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Belum ada pemain. Tambahkan minimal 4 nama.</p>
         )}
       </section>
 
       <section className={KELAS_KARTU}>
-        <p role="status" className="mb-3 text-sm font-medium text-amber-700">
+        <p role="status" className="mb-3 text-sm font-medium text-amber-700 dark:text-amber-400">
           {pesanMulai ?? 'Semua syarat terpenuhi. Tekan Mulai untuk mengacak match.'}
         </p>
         <button

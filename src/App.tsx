@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useReducer } from 'react'
+import { BerandaScreen } from './components/BerandaScreen'
 import { DaftarMatchScreen } from './components/DaftarMatchScreen'
+import { TombolTema } from './components/TombolTema'
 import { RekapScreen } from './components/RekapScreen'
 import { SetupScreen } from './components/SetupScreen'
 import { SkorScreen } from './components/SkorScreen'
@@ -21,6 +23,8 @@ export default function App() {
 
   const ronde = rondeAktif(sesi)
   const matchDibuka = ronde?.match.find((m) => m.id === sesi.matchAktif)
+
+  if (sesi.layar === 'beranda') return <BerandaScreen dispatch={dispatch} />
 
   const layar = () => {
     switch (sesi.layar) {
@@ -47,34 +51,41 @@ export default function App() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="border-b border-slate-200 bg-white">
+      <header className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
         <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 py-3">
             
           <div className="min-w-0">
-            <p className="truncate text-lg font-black tracking-tight text-teal-800">Bultang Match Tracker</p>
-            <p className="text-xs text-slate-500">Acak pasangan, catat skor, lihat rekap.</p>
+            <p className="truncate text-lg font-black tracking-tight text-teal-800 dark:text-teal-300">
+              Bultang Match Tracker
+            </p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Acak pasangan, catat skor, lihat rekap.
+            </p>
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              if (
-                window.confirm(
-                  'Yakin ingin menghapus seluruh data sesi dan memulai dari awal?',
-                )
-              ) {
-                dispatch({ type: 'sesi_baru' })
-              }
-            }}
-            className="min-h-11 rounded-xl border border-slate-300 px-3 text-sm font-semibold text-slate-600 hover:bg-slate-50"
-          >
-            Mulai sesi baru
-          </button>
+          <div className="flex shrink-0 items-center gap-2">
+            <TombolTema />
+            <button
+              type="button"
+              onClick={() => {
+                if (
+                  window.confirm(
+                    'Yakin ingin menghapus seluruh data sesi dan memulai dari awal?',
+                  )
+                ) {
+                  dispatch({ type: 'sesi_baru' })
+                }
+              }}
+              className="min-h-11 rounded-xl border border-slate-300 px-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
+            >
+              Mulai sesi baru
+            </button>
+          </div>
         </div>
       </header>
 
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6">{layar()}</main>
 
-      <footer className="px-4 py-4 text-center text-xs text-slate-400">
+      <footer className="px-4 py-4 text-center text-xs text-slate-400 dark:text-slate-500">
         Data tersimpan di perangkat ini saja (localStorage).
       </footer>
     </div>

@@ -21,7 +21,7 @@ export function RekapScreen({ sesi, dispatch, nama }: Props) {
         <div className="-mx-1 overflow-x-auto">
           <table className="w-full border-collapse text-sm">
             <thead>
-              <tr className="border-b border-slate-200 text-left text-xs uppercase tracking-wide text-slate-400">
+              <tr className="border-b border-slate-200 text-left text-xs uppercase tracking-wide text-slate-400 dark:border-slate-700 dark:text-slate-500">
                 <th scope="col" className="py-2 pr-2 font-bold">
                   Pemain
                 </th>
@@ -41,8 +41,8 @@ export function RekapScreen({ sesi, dispatch, nama }: Props) {
             </thead>
             <tbody>
               {tabel.map((b) => (
-                <tr key={b.id} className="border-b border-slate-100 last:border-0">
-                  <th scope="row" className="py-2 pr-2 text-left font-semibold text-slate-700">
+                <tr key={b.id} className="border-b border-slate-100 last:border-0 dark:border-slate-800">
+                  <th scope="row" className="py-2 pr-2 text-left font-semibold text-slate-700 dark:text-slate-200">
                     {b.nama}
                   </th>
                   <td className="py-2 px-2 text-center tabular-nums">{b.menang + b.kalah}</td>
@@ -54,7 +54,7 @@ export function RekapScreen({ sesi, dispatch, nama }: Props) {
             </tbody>
           </table>
         </div>
-        <p className="mt-3 text-xs text-slate-500">
+        <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
           Poin adalah total skor tim tempat pemain bermain. Match yang belum selesai tidak dihitung.
         </p>
       </section>
@@ -66,10 +66,10 @@ export function RekapScreen({ sesi, dispatch, nama }: Props) {
             {ronde.match.map((m, i) => (
               <li
                 key={m.id}
-                className="flex items-center justify-between gap-3 border-b border-slate-100 py-2 last:border-0"
+                className="flex items-center justify-between gap-3 border-b border-slate-100 py-2 last:border-0 dark:border-slate-800"
               >
                 <div className="min-w-0">
-                  <p className="text-xs font-semibold text-slate-400">Match {i + 1}</p>
+                  <p className="text-xs font-semibold text-slate-400 dark:text-slate-500">Match {i + 1}</p>
                   <p className="truncate text-sm font-medium">
                     {m.timA.map(nama).join(', ')}
                   </p>
@@ -77,14 +77,14 @@ export function RekapScreen({ sesi, dispatch, nama }: Props) {
                     {m.timB.map(nama).join(', ')}
                   </p>
                 </div>
-                <p className="shrink-0 text-xl font-black tabular-nums text-teal-700">
+                <p className="shrink-0 text-xl font-black tabular-nums text-teal-700 dark:text-teal-300">
                   {m.skorA}–{m.skorB}
                 </p>
               </li>
             ))}
           </ul>
           {ronde.istirahat.length > 0 && (
-            <p className="mt-2 text-xs text-slate-500">
+            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
               Istirahat:{' '}
               {ronde.istirahat.map(nama).join(', ')}
             </p>

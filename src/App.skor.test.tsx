@@ -1,8 +1,7 @@
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import App from './App'
-import { bukaMatch, kartuMatch, mulaiSesi, ubahSkor } from './test/harness'
+import { bukaAplikasi, bukaMatch, kartuMatch, lewatiBeranda, mulaiSesi, ubahSkor } from './test/harness'
 
 beforeEach(() => localStorage.clear())
 
@@ -26,7 +25,7 @@ const selesaikanMatch = async (
 describe('layar detail skor', () => {
   it('menampilkan dua tim dengan tombol tambah/kurang berlabel aria-label', async () => {
     const pengguna = userEvent.setup()
-    render(<App />)
+    await bukaAplikasi(pengguna)
     await mulaiSesi(pengguna, DELAPAN)
     await bukaMatch(pengguna, 0)
 
@@ -40,7 +39,7 @@ describe('layar detail skor', () => {
 
   it('tombol ▲ menambah skor dan ▼ tidak membuat skor negatif', async () => {
     const pengguna = userEvent.setup()
-    render(<App />)
+    await bukaAplikasi(pengguna)
     await mulaiSesi(pengguna, DELAPAN)
     await bukaMatch(pengguna, 0)
 
@@ -59,7 +58,7 @@ describe('layar detail skor', () => {
 
   it('skor pertama diubah menandai match sedang main', async () => {
     const pengguna = userEvent.setup()
-    render(<App />)
+    await bukaAplikasi(pengguna)
     await mulaiSesi(pengguna, DELAPAN)
 
     expect(within(kartuMatch()[0]).getByText('Belum main')).toBeInTheDocument()
@@ -72,7 +71,7 @@ describe('layar detail skor', () => {
 
   it('membuka match yang belum dimainkan tanpa mengubah skor pun menandai sedang main', async () => {
     const pengguna = userEvent.setup()
-    render(<App />)
+    await bukaAplikasi(pengguna)
     await mulaiSesi(pengguna, DELAPAN)
     await bukaMatch(pengguna, 0)
     await pengguna.click(screen.getByRole('button', { name: 'Kembali' }))
@@ -83,7 +82,7 @@ describe('layar detail skor', () => {
 describe('alur ronde', () => {
   it('tombol Selesai menandai match selesai dan kembali ke daftar', async () => {
     const pengguna = userEvent.setup()
-    render(<App />)
+    await bukaAplikasi(pengguna)
     await mulaiSesi(pengguna, DELAPAN)
 
     await bukaMatch(pengguna, 0)
@@ -96,7 +95,7 @@ describe('alur ronde', () => {
 
   it('tombol Lanjut ronde nonaktif sampai semua match berstatus Selesai', async () => {
     const pengguna = userEvent.setup()
-    render(<App />)
+    await bukaAplikasi(pengguna)
     await mulaiSesi(pengguna, DELAPAN)
 
     expect(screen.getByRole('button', { name: 'Lanjut ronde' })).toBeDisabled()
@@ -110,7 +109,7 @@ describe('alur ronde', () => {
 
   it('match yang sudah selesai bisa dibuka lagi untuk mengoreksi skor', async () => {
     const pengguna = userEvent.setup()
-    render(<App />)
+    await bukaAplikasi(pengguna)
     await mulaiSesi(pengguna, DELAPAN)
     await selesaikanMatch(pengguna, 0)
     expect(within(kartuMatch()[0]).getByText('Selesai')).toBeInTheDocument()
@@ -126,7 +125,7 @@ describe('alur ronde', () => {
 
   it('pemain yang istirahat ikut bermain setelah acak ulang dan lanjut ronde', async () => {
     const pengguna = userEvent.setup()
-    render(<App />)
+    await bukaAplikasi(pengguna)
     await mulaiSesi(pengguna, SEMBILAN)
 
     const istirahatRonde1 = pemainIstirahat()
@@ -149,7 +148,7 @@ describe('alur ronde', () => {
 
   it('mengakhiri sesi dari ringkasan membuka layar rekap', async () => {
     const pengguna = userEvent.setup()
-    render(<App />)
+    await bukaAplikasi(pengguna)
     await mulaiSesi(pengguna, DELAPAN)
     await selesaikanMatch(pengguna, 0)
     await selesaikanMatch(pengguna, 1)
@@ -162,7 +161,7 @@ describe('alur ronde', () => {
 describe('rekap', () => {
   it('menampilkan seluruh match beserta skor akhir dan klasemen', async () => {
     const pengguna = userEvent.setup()
-    render(<App />)
+    await bukaAplikasi(pengguna)
     await mulaiSesi(pengguna, DELAPAN)
     await selesaikanMatch(pengguna, 0)
     await selesaikanMatch(pengguna, 1)
@@ -178,7 +177,7 @@ describe('rekap', () => {
 
   it('mulai sesi baru meminta konfirmasi lalu menghapus data', async () => {
     const pengguna = userEvent.setup()
-    render(<App />)
+    await bukaAplikasi(pengguna)
     await mulaiSesi(pengguna, DELAPAN)
     await selesaikanMatch(pengguna, 0)
     await selesaikanMatch(pengguna, 1)
@@ -194,6 +193,12 @@ describe('rekap', () => {
 
     konfirmasi.mockReturnValue(true)
     await pengguna.click(screen.getByRole('button', { name: 'Mulai sesi baru' }))
+    expect(
+      screen.getByRole('heading', { name: 'Match Tracker Bulutangkis' }),
+    ).toBeInTheDocument()
+    expect(localStorage.getItem('bultang.sesi.v1')).toContain('"layar":"beranda"')
+
+    await lewatiBeranda(pengguna)
     expect(screen.getByLabelText('Nama pemain')).toBeInTheDocument()
     expect(localStorage.getItem('bultang.sesi.v1')).toContain('"layar":"setup"')
     konfirmasi.mockRestore()

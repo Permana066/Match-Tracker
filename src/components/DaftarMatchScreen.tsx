@@ -17,7 +17,7 @@ export function DaftarMatchScreen({ sesi, dispatch, nama }: Props) {
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-5">
       <header className="flex flex-wrap items-baseline justify-between gap-2">
         <h1 className="text-2xl font-bold">Ronde {ronde.nomor}</h1>
-        <p className="text-sm font-medium text-slate-500">
+        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
           {ronde.match.length} match · mode {sesi.mode}
         </p>
       </header>
@@ -31,10 +31,10 @@ export function DaftarMatchScreen({ sesi, dispatch, nama }: Props) {
                 <span
                   className={`rounded-full px-3 py-1 text-xs font-bold ${
                     m.status === 'selesai'
-                      ? 'bg-emerald-100 text-emerald-800'
+                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300'
                       : m.status === 'sedang_main'
-                        ? 'bg-amber-100 text-amber-800'
-                        : 'bg-slate-100 text-slate-600'
+                        ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300'
+                        : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
                   }`}
                 >
                   {LABEL_STATUS[m.status]}
@@ -44,17 +44,17 @@ export function DaftarMatchScreen({ sesi, dispatch, nama }: Props) {
               <div className="mb-4 flex items-center justify-between gap-4">
                 <div className="flex min-w-0 flex-1 flex-col gap-3">
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Tim A</p>
+                    <p className="text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-slate-500">Tim A</p>
                     <p className="truncate font-medium">{m.timA.map(nama).join(', ')}</p>
                   </div>
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Tim B</p>
+                    <p className="text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-slate-500">Tim B</p>
                     <p className="truncate font-medium">{m.timB.map(nama).join(', ')}</p>
                   </div>
                 </div>
                 <p
                   data-testid={`skor-akhir-${m.id}`}
-                  className="shrink-0 text-4xl font-black tabular-nums text-teal-700"
+                  className="shrink-0 text-4xl font-black tabular-nums text-teal-700 dark:text-teal-300"
                 >
                   {m.skorA}–{m.skorB}
                 </p>
@@ -78,7 +78,7 @@ export function DaftarMatchScreen({ sesi, dispatch, nama }: Props) {
           <h2 id="judul-istirahat" className="mb-2 text-lg font-bold">
             Istirahat
           </h2>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-slate-600 dark:text-slate-300">
             {ronde.istirahat.map(nama).join(', ')} — diprioritaskan main di ronde berikutnya.
           </p>
         </section>
@@ -93,7 +93,7 @@ export function DaftarMatchScreen({ sesi, dispatch, nama }: Props) {
         Lanjut ronde
       </button>
       {!lengkap && (
-        <p className="-mt-3 text-center text-sm text-slate-500">
+        <p className="-mt-3 text-center text-sm text-slate-500 dark:text-slate-400">
           Selesaikan semua match dulu untuk melanjutkan.
         </p>
       )}
